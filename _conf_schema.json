@@ -1,0 +1,141 @@
+{
+  "enabled": {
+    "description": "启用智能艾特门禁",
+    "type": "bool",
+    "default": true,
+    "hint": "总开关，关闭后不拦截任何@消息。"
+  },
+  "enable_debounce": {
+    "description": "启用前置消息防抖（碎句智能合并）",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后自动收集用户分多次发送的碎片消息与图片，等句子表达完整后再统一提交给大模型，避免发一句回一句。"
+  },
+  "debounce_timeout": {
+    "description": "防抖等待超时（秒）",
+    "type": "float",
+    "default": 8.0,
+    "hint": "当用户句子未说完时，最多等待多少秒；超时后自动合并已收到的所有消息并发送给模型（默认 8 秒）。"
+  },
+  "debounce_threshold": {
+    "description": "句子完整度判定阈值",
+    "type": "float",
+    "default": 0.8,
+    "hint": "语义模型判定用户已表达完整的置信度阈值（0.0 ~ 1.0，默认 0.8）。高于此分值认为已说完，立即开始回复。"
+  },
+  "usage_scope": {
+    "description": "防抖生效范围",
+    "type": "string",
+    "default": "both",
+    "options": ["both", "group", "private"],
+    "hint": "both: 群聊和私聊均生效；group: 仅群聊生效；private: 仅私聊生效。"
+  },
+  "use_jev": {
+    "description": "启用语义意图与完整度模型决策",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后通过语义模型智能识别是否说完及是否为等待期催促；关闭时退回纯规则状态机。"
+  },
+  "astrbot_provider_id": {
+    "description": "选择使用 AstrBot 内部已配置的模型 (Provider ID)",
+    "type": "string",
+    "default": "",
+    "hint": "留空表示使用 AstrBot 当前默认主聊天模型；也可填 AstrBot 后台「服务提供商」中已配置的模型 ID（如 火山/kimi-k2.8-preview、siliconflow 等）。未配置下方独立第三方 API Key 时生效。"
+  },
+  "astrbot_model_name": {
+    "description": "AstrBot 内部模型名称覆盖 (可选)",
+    "type": "string",
+    "default": "",
+    "hint": "可选。当指定的 Provider 支持多个模型时，填具体模型名进行指定覆盖。"
+  },
+  "jev_api_key": {
+    "description": "独立第三方模型 API Key（可选）",
+    "type": "string",
+    "default": "",
+    "hint": "可选。若想使用专用 JEV 模型（如 TypeSafe / OpenRouter）或独立的第三方中转（硅基流动 SiliconFlow、DeepSeek、OpenAI 等），在此填写其 API Key。"
+  },
+  "jev_base_url": {
+    "description": "独立模型接口基地址（可选）",
+    "type": "string",
+    "default": "https://api.typesafe.ai/v1",
+    "hint": "支持 TypeSafe 官方 (https://api.typesafe.ai/v1)、OpenRouter (https://openrouter.ai/api/v1)、硅基流动 (https://api.siliconflow.cn/v1)、DeepSeek (https://api.deepseek.com/v1) 等任何兼容接口。"
+  },
+  "jev_model": {
+    "description": "独立模型名称 / ID",
+    "type": "string",
+    "default": "jev-latest",
+    "hint": "JEV 类填 jev-latest 或 typesafe/jev-1.14；普通大模型填 Qwen/Qwen2.5-7B-Instruct、deepseek-chat 等。非 JEV 模型会自动调用 Chat Completions 协议。"
+  },
+  "jev_threshold": {
+    "description": "多次@需要回复判定阈值",
+    "type": "float",
+    "default": 0.5,
+    "hint": "模型判定需要回复多次@的置信度阈值（0.0 ~ 1.0，默认 0.5）。高于此值放行回复，低于此值视作等待期催促/冗余并拦截。"
+  },
+  "jev_timeout_seconds": {
+    "description": "独立模型请求超时（秒）",
+    "type": "float",
+    "default": 10.0,
+    "hint": "单次语义判断超时时间（秒）。超时自动无缝降级走规则兜底，绝不卡死聊天。"
+  },
+  "jev_judge_all": {
+    "description": "纯空@也交由模型判定",
+    "type": "bool",
+    "default": false,
+    "hint": "默认关闭。关闭时纯空@走 0 Token 规则快速拦截（节省调用量）；开启时纯空@也交由模型判定。"
+  },
+  "at_threshold": {
+    "description": "多次@触发阈值",
+    "type": "int",
+    "default": 2,
+    "hint": "时间窗口内同一用户@机器人的次数大于该值时，开始执行意图识别与冗余拦截。默认 2（即第 2 次及以上开始评估）。"
+  },
+  "window_seconds": {
+    "description": "滑动统计窗口（秒）",
+    "type": "int",
+    "default": 30,
+    "hint": "统计连续@的滑动时间窗口，超时后计数自动重置。"
+  },
+  "suppress_empty_at": {
+    "description": "静默拦截纯空艾特",
+    "type": "bool",
+    "default": true,
+    "hint": "开启后，若用户短时间内连续发纯@（除@外无任何有效文本与媒体），直接静默拦截，避免连回「在的/叫我吗」。"
+  },
+  "suppress_during_active_run": {
+    "description": "生成期间抑制催促与连点",
+    "type": "bool",
+    "default": true,
+    "hint": "当机器人在当前会话正在为该用户生成回答时，其后续发出的空@或催促词自动进入判定。"
+  },
+  "cooldown_after_reply_sec": {
+    "description": "回复刚发出后的收敛保护期（秒）",
+    "type": "int",
+    "default": 5,
+    "hint": "回复发出后这几秒内到达的纯空@（通常是网络延迟或刚发送的积压消息），视同冗余直接丢弃。"
+  },
+  "allow_distinct_questions": {
+    "description": "规则兜底放行明显新意图问题",
+    "type": "bool",
+    "default": true,
+    "hint": "在规则兜底模式下，如果后续@包含明显的新问题文本（长度超过阈值且非催促词），即便多次@也允许正常排队回答。"
+  },
+  "min_distinct_length": {
+    "description": "规则兜底新问题判定最小字符数",
+    "type": "int",
+    "default": 3,
+    "hint": "超过此字数且不命中催促词库的内容，视为独立新问题予以放行。"
+  },
+  "rush_keywords": {
+    "description": "规则兜底常见催促词列表",
+    "type": "string",
+    "default": "?,？,??,？？,在吗,在么,人呢,说话,快点,出来,喂,hi,hello,ciallo",
+    "hint": "逗号分隔。当处于多次@或正在生成且降级走规则时，命中这些短语视为无意义催促，予以静默拦截。"
+  },
+  "log_intercept": {
+    "description": "输出拦截日志",
+    "type": "bool",
+    "default": true,
+    "hint": "拦截冗余@时在 AstrBot 日志中打印详细拦截原因，便于排查与统计。"
+  }
+}

@@ -1,0 +1,21 @@
+name: astrbot_plugin_at_gate
+display_name: 智能艾特门禁与消息防抖
+short_desc: 智能消息防抖合并与多次@生成期催促门禁，支持 JEV/通用大模型/原生模型零配置
+desc: 智能艾特门禁与消息防抖（at_gate）：融合前置消息防抖（碎句合并）与后置艾特门禁（生成期催促拦截）的一体化对话节奏守护插件。参考并整合 astrbot_plugin_debounce 的前置滑动防抖能力，智能识别未说完的碎片消息与图片并合并为一次提问；同时解决用户在模型思考生成期间连续催促、纯空@导致机器人连发多条机械式问候的痛点。支持 TypeSafe JEV 原生 Noul 概率决策、通用大模型 Chat Completions 协议及 AstrBot 原生模型零配置复用。
+version: 1.0.0
+author: Meru
+repo: https://github.com/Meru-tea/astrbot_plugin_at_gate
+astrbot_version: ">=4.24,<5"
+support_platforms:
+  - aiocqhttp
+  - qq_official
+  - lark
+  - wecom
+  - telegram
+tags:
+  - 消息防抖
+  - 防刷屏
+  - 智能艾特
+  - 防催促
+  - 碎句合并
+  - JEV
