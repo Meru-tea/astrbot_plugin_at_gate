@@ -32,6 +32,15 @@ class Decision:
 
 def is_at_bot(event: Any) -> bool:
     """检查事件是否 @ 了当前机器人（纯鸭子类型，零依赖）"""
+    # 1. 私聊事件不存在艾特机器人概念，不纳入艾特门禁
+    is_private_fn = getattr(event, "is_private_chat", None)
+    if callable(is_private_fn) and is_private_fn():
+        return False
+    umo = str(getattr(event, "unified_msg_origin", "") or "")
+    if ":FriendMessage:" in umo:
+        return False
+
+    # 2. 检查唤醒词或 AstrBot 标记（仅群聊有效）
     if getattr(event, "is_at_or_wake_command", False):
         return True
     get_self_id = getattr(event, "get_self_id", None)

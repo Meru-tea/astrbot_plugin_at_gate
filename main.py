@@ -30,7 +30,7 @@ from .debounce_buffer import MessageBuffer, get_image_components, image_source
 from .gatekeeper import AtGatekeeper, Decision, extract_content, is_at_bot
 
 PLUGIN_NAME = "astrbot_plugin_at_gate"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 DISPLAY_NAME = "智能艾特门禁与消息防抖"
 
 
@@ -137,6 +137,8 @@ class AtGatePlugin(Star):
     async def on_agent_begin(self, event: AstrMessageEvent, run_context: Any) -> None:
         """感知会话 Agent 开始执行，登记为活跃状态并记录正在回答的提问文本"""
         try:
+            if getattr(event, "is_private_chat", lambda: False)():
+                return
             umo = getattr(event, "unified_msg_origin", "")
             sender_id = str(event.get_sender_id() or "")
             raw_text, _ = extract_content(event)
@@ -151,6 +153,8 @@ class AtGatePlugin(Star):
     ) -> None:
         """感知会话 Agent 结束执行，解除活跃状态并启动冷却期"""
         try:
+            if getattr(event, "is_private_chat", lambda: False)():
+                return
             umo = getattr(event, "unified_msg_origin", "")
             sender_id = str(event.get_sender_id() or "")
             if umo:
@@ -160,8 +164,12 @@ class AtGatePlugin(Star):
 
     @filter.event_message_type(filter.EventMessageType.ALL, priority=999)
     async def on_message_gate(self, event: AstrMessageEvent) -> None:
-        """最高优先级事件门禁：在进入 LLM 或下游插件前完成冗余 @ 识别与拦截"""
+        """最高优先级事件门禁：在进入 LLM 或下游插件前完成冗余 @ 识别与拦截（仅群聊生效）"""
         if not self.gatekeeper.enabled:
+            return
+
+        # 私聊直接放行，艾特门禁仅针对群聊
+        if getattr(event, "is_private_chat", lambda: False)():
             return
 
         is_at = is_at_bot(event)
@@ -224,7 +232,8 @@ class AtGatePlugin(Star):
         session_id = event.session_id
         msg_id = str(getattr(getattr(event, "message_obj", None), "message_id", "") or "")
         message_text = (getattr(event, "message_str", "") or "").strip()
-
+        if not message_text and not req.image_urls:
+            return
         if self.waiting_msg_ids.get(session_id) == msg_id:
             self.waiting_msg_ids.pop(session_id, None)
 
@@ -382,8 +391,15 @@ class AtGatePlugin(Star):
                 elif msg_type_str == "FRIEND_MESSAGE":
                     msg_type_str = "FriendMessage"
 
+            self_id = str(
+                original_event.get_self_id()
+                if callable(getattr(original_event, "get_self_id", None))
+                else getattr(getattr(original_event, "message_obj", None), "self_id", "") or ""
+            )
+
             new_message = await StarTools.create_message(
                 type=msg_type_str,
+                self_id=self_id,
                 session_id=original_event.session_id,
                 sender=original_event.message_obj.sender,
                 message=new_message_components,

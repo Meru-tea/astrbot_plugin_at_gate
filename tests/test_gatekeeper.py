@@ -214,6 +214,25 @@ class TestAtGatekeeper(unittest.IsolatedAsyncioTestCase):
         _, has_media = extract_content(event_img)
         self.assertTrue(has_media)
 
+        # 私聊事件即使带有 is_at_or_wake_command 也必须返回 False
+        event_private = SimpleNamespace(
+            is_at_or_wake_command=True,
+            is_private_chat=lambda: True,
+            get_self_id=lambda: "2538085748",
+            message_obj=SimpleNamespace(message=[MockPlain(text="好哦")]),
+            message_str="好哦",
+        )
+        self.assertFalse(is_at_bot(event_private))
+
+        # 私聊 UMO 兜底也必须返回 False
+        event_friend_umo = SimpleNamespace(
+            is_at_or_wake_command=True,
+            unified_msg_origin="Atri:FriendMessage:3217243301",
+            get_self_id=lambda: "2538085748",
+            message_obj=SimpleNamespace(message=[MockPlain(text="好哦")]),
+            message_str="好哦",
+        )
+        self.assertFalse(is_at_bot(event_friend_umo))
     # ==================== JEV 语义意图模型专项测试 ====================
 
     async def test_jev_judge_impatient_rush(self):
