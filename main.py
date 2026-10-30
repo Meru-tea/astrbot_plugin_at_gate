@@ -30,7 +30,7 @@ from .debounce_buffer import MessageBuffer, get_image_components, image_source
 from .gatekeeper import AtGatekeeper, Decision, extract_content, is_at_bot
 
 PLUGIN_NAME = "astrbot_plugin_at_gate"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 DISPLAY_NAME = "智能艾特门禁与消息防抖"
 
 

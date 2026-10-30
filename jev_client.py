@@ -433,11 +433,19 @@ class JevClient:
         if any(t.endswith(p) for p in terminal_puncts):
             return True, 0.95, "rule_terminal_punct"
 
-        # 常见未完结条件/原因从句前缀
-        incomplete_prefixes = ("如果", "因为", "要是", "只要", "假如", "既然")
-        if any(t.startswith(p) for p in incomplete_prefixes):
-            return False, 0.15, "rule_incomplete_prefix"
+        # 常见独立日常简短问候/应答词（避免晚安、早安、好的等短语被当作碎片拦截）
+        common_complete_words = (
+            "晚安", "早安", "午安", "好的", "好", "在吗", "在么", "你好", "您好",
+            "hi", "hello", "收到", "谢谢", "谢啦", "多谢", "再见", "拜拜", "是的",
+            "对", "行", "可以", "快点", "ok", "okay"
+        )
+        if t.lower() in common_complete_words:
+            return True, 0.95, "rule_common_greeting"
 
+        # 常见未完结短条件/原因从句前缀（且尚未展开）
+        incomplete_prefixes = ("如果", "因为", "要是", "只要", "假如", "既然")
+        if any(t.startswith(p) for p in incomplete_prefixes) and len(t) < 8 and not any(p in t for p in ("，", ",", " ", "。", "！", "？")):
+            return False, 0.15, "rule_incomplete_prefix"
         # 常见未完结连词/语气词结尾
         incomplete_endings = ("如果", "因为", "但是", "然后", "那个", "还有", "就是", "想问下", "帮我", "比如", "以及")
         for suffix in incomplete_endings:

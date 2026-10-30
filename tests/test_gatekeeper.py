@@ -413,11 +413,14 @@ class TestAtGatekeeper(unittest.IsolatedAsyncioTestCase):
 
         complete_2, _, _ = await self.gk.jev_client.evaluate_sentence_completeness("帮我写一段Python代码。")
         self.assertTrue(complete_2)
+        # 常见日常问候如“晚安”即使字数短也不应被误判为未完结碎片
+        complete_greeting, _, reason_g = await self.gk.jev_client.evaluate_sentence_completeness("晚安")
+        self.assertTrue(complete_greeting)
+        self.assertEqual(reason_g, "rule_common_greeting")
 
         # 带图消息直接判定完整
         complete_img, _, _ = await self.gk.jev_client.evaluate_sentence_completeness("", has_media=True)
         self.assertTrue(complete_img)
-
     async def test_sentence_completeness_model(self):
         """测试模型判定句子完整性（JEV / OpenAI 协议）"""
         self.gk.update_config({
