@@ -30,7 +30,7 @@ from .debounce_buffer import MessageBuffer, get_image_components, image_source
 from .gatekeeper import AtGatekeeper, Decision, extract_content, is_at_bot
 
 PLUGIN_NAME = "astrbot_plugin_at_gate"
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 DISPLAY_NAME = "智能艾特门禁与消息防抖"
 
 
@@ -397,6 +397,14 @@ class AtGatePlugin(Star):
                 else getattr(getattr(original_event, "message_obj", None), "self_id", "") or ""
             )
 
+            orig_id = getattr(getattr(original_event, "message_obj", None), "message_id", 0)
+            if isinstance(orig_id, int) and orig_id > 0:
+                new_msg_id = (orig_id + 1) % 2147483647
+            elif isinstance(orig_id, str) and orig_id.isdigit():
+                new_msg_id = str((int(orig_id) + 1) % 2147483647)
+            else:
+                new_msg_id = f"{orig_id}_r{int(time.time())}"
+
             new_message = await StarTools.create_message(
                 type=msg_type_str,
                 self_id=self_id,
@@ -405,7 +413,7 @@ class AtGatePlugin(Star):
                 message=new_message_components,
                 message_str=message_text,
                 group_id=original_event.get_group_id() or "",
-                message_id=original_event.message_obj.message_id,
+                message_id=new_msg_id,
             )
 
             self.skip_debounce_msg_ids.add(new_message.message_id)

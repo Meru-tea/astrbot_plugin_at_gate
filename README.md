@@ -4,7 +4,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/AstrBot-4.24%2B-4b6bfb?style=flat-square" alt="AstrBot 4.24+">
-  <img src="https://img.shields.io/badge/Version-v1.0.2-52c41a?style=flat-square" alt="v1.0.2">
+  <img src="https://img.shields.io/badge/Version-v1.0.3-52c41a?style=flat-square" alt="v1.0.3">
   <img src="https://img.shields.io/badge/Decision-JEV%20%7C%20OpenAI%20%7C%20Native-722ed1?style=flat-square" alt="Decision Engines">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3fb950?style=flat-square" alt="MIT"></a>
 </p>
@@ -147,7 +147,7 @@ git clone https://github.com/Meru-tea/astrbot_plugin_at_gate.git
 
 输出示例：
 ```text
-🛡️ 【智能艾特门禁与消息防抖 v1.0.2 运行状态】
+🛡️ 【智能艾特门禁与消息防抖 v1.0.3 运行状态】
 • 门禁开关: 开启
 • 消息防抖: 开启 (超时: 8s, 阈值: 0.8)
 • 语义决策: 独立第三方API (Qwen/Qwen2.5-7B-Instruct, 协议=ChatCompletions, 决策调用: 12次)
